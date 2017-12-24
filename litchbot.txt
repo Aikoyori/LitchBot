@@ -1,0 +1,67 @@
+**LitchBot** by LitchSchist
+**HELP Page 1/3**
+
+**CvoltonGDPS's Command**
+`level` [Level Keyword or Level ID] - Retrieve The Level Information with provided level
+`song` [Song ID] - Retrieve The Song Information with provided ID
+`player` [Player Keyword or Player ID] - Retrieve Player Information with provided player
+`whorated` [level ID] - Show the moderator who rated the provided level ID
+`songup` [Direct Song Links] - Reupload songs onto CvoltonGDPS
+`top` [Type] [Page] - See the leaderboard of the choosen type
+
+**Utility Command**
+`b64en` [Text to encode to Base 64] - Encode text into Base 64
+`b64de` [Base 64 text to decode] - Decode Base 64 into normal text
+`invite` - Get the invite link of the bot
+`help` - Show This Message
+`changelog` - Show Changelog
+`google` [query] - Get the first result on Google from the query
+`youtube` [query] - Get the first result on Youtube from the query
+
+
+**Music Command**
+<NONE YET>
+
+|	
+**LitchSelfBot** by LitchSchist
+**HELP Page 2/3**
+
+**Fun Command**
+`say` [text] - Send message in bot behalf
+`sayd` [text] - Send message in bot behalf and also delete the command text
+`sakujes` [text] - sakujes
+`touhou` - ~~Gives an execute to mom~~
+`emojify` - Emojify the text `Credit Supersebi3`
+`emojifyred` - Emojify the text with red A ,B and O `Credit Supersebi3`
+`give` [user] [item id] [data] - Give item `Credit mat for helping me!`
+`summon` <Entity> <x> <y> <z> [data] - Give item `Credit mat for helping me!`
+`urban` <word or phrase> - Find the given word or phrase on Urban Dictionary.
+`flipcoin` [coins] - Flip [coins] dice if [coins] is not given will flip	 1
+`rolldice` [dices] - Roll [dices] dice if [dices] is not given will roll 1
+
+**Other Information Command**
+`api` - see api that LitchSelfBot use!
+`suggest` - Suggest a feature!
+`ping` - Check Bot Latency `Credit Supersebri3 and Empty` 
+`userinfo` - Get user information
+`serverinfo` - Get server information
+**Moderate Command**
+`cls` - Push message up with clean `Credit Supersebi3` **`MANAGE MESSAGE`**
+
+**Extension**
+`load` [EXT NAME] Load an extension ***OWNER ONLY***
+`unload` [EXT NAME] Unoad an extension ***OWNER ONLY***
+
+**Owner Command**
+`eval` [text] - RUN CMD ***OWNER ONLY***
+`exec` [text] - RUN CMD ***OWNER ONLY***
+`setgame` [game name] - Set game ***OWNER ONLY***
+`repeat` [times] [text] - Send Repetitive message ***OWNER ONLY***
+**Use -c option to display in current chat!!**
+|
+**LitchSelfBot** by LitchSchist
+**HELP Page 2/3**
+**osu!commands**
+Mode : std , taiko , ctb , mania
+Uses short mods name (e.g. nf hc nc dt hd)
+`osu user` [mode] [username] - Get user info from username/ID
