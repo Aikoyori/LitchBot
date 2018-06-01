@@ -2,13 +2,16 @@
 from __future__ import print_function, unicode_literals
 from os import urandom
 import datetime as dt
+
 from discord.ext.commands import Bot
+import discord.ext as ext
 import discord
 import datetime, re
 import asyncio
 import base64
 import subprocess
 import os.path
+from math import *
 import io
 from io import BytesIO
 from apiclient.discovery import build
@@ -35,7 +38,7 @@ import youtube_dl
 from bs4 import BeautifulSoup
 import time
 import random
-from google import search
+from googlesearch import search
 import textwrap
 import urbandictionary as ud
 import osuapi
@@ -48,7 +51,7 @@ initial_extensions = [
 ]
 prefix="l!"
 a=len(prefix)
-umrbot = Bot(command_prefix="litaca!",max_messages=65536)
+client = Bot(command_prefix="litaca!",max_messages=65536)
 umarbot = discord.Client()
 xd=""
 enabledosu=True
@@ -64,9 +67,9 @@ if enabledosu:
     osu = osuapi.osu.OsuApi(key=xdddd,connector=osuapi.connectors.ReqConnector())
 else:
     print("osu! api key not found... osu! feature disabled")
-@umrbot.command()
+@client.command()
 async def hello(*args):
-    return await umrbot.say("uu")
+    return await client.say("uu")
 class LitchErr(Exception):
     pass
 class NumberNotText(LitchErr):
@@ -81,25 +84,25 @@ def checkpos(ss):
     else:
         return int(ss)
 urlaa = "http://pi.michaelbrabec.cz:9010/a/"
-@umrbot.event
+@client.event
 async def on_ready():
-    #await umrbot.change_presence(game=discord.Game(name='Geometry Dash Deadlocked 50%',link="twitch.tv/hikarichizaki",type=1))
+    #await client.change_presence(game=discord.Game(name='Geometry Dash Deadlocked 50%',link="twitch.tv/hikarichizaki",type=1))
     print("Client logged in as ")
-    print(umrbot.user.name)
-    print(umrbot.user.id)
-    print(umrbot.user.id)    
+    print(client.user.name)
+    print(client.user.id)
+    print(client.user.id)    
     print('------')
-    print(umrbot)
+    print(client)
     print("at "+str(dt.datetime.now()))
-@umrbot.event
+@client.event
 async def on_server_join(server):
-    await umrbot.send_message(umrbot.owner,"Someone invited me to `"+server.name+"`")
-@umrbot.event
+    await client.send_message(client.owner,"Someone invited me to `"+server.name+"`")
+@client.event
 async def on_server_remove(server):
-    await umrbot.send_message(umrbot.owner,"Someone removed me from `"+server.name+"`")
+    await client.send_message(client.owner,"Someone removed me from `"+server.name+"`")
     
-@umrbot.event
-async def on_message(message):
+@client.event
+async def on_message(message,retry=-1):
     mcp=message.content
     mc=message.content.lower()
     mh=message.channel
@@ -109,11 +112,11 @@ async def on_message(message):
     else:
         ms=message.server
     mt=message.timestamp
-    ar=umrbot.add_reaction
-    edm=umrbot.edit_message
+    ar=client.add_reaction
+    edm=client.edit_message
     mm=message.mentions
     m=message.content.startswith
-    mmm=list(umrbot.get_all_members())
+    mmm=list(client.get_all_members())
     with open("unallowed.txt","r") as fi:
         content = fi.readlines() 
     unallowed = [x.strip() for x in content ]
@@ -159,13 +162,13 @@ async def on_message(message):
                         emb.set_thumbnail(url="https://a.ppy.sh/"+str(user.user_id))
                         emb.add_field(name="Hit Counts",value="**300** : "+str(user.count300)+"\n**100** : "+str(user.count100)+"\n**50** : "+str(user.count50),inline=True)
                         emb.add_field(name="Score",value="**Total Scores : **"+str(user.total_score)+"\n**Ranked Score : **"+str(user.ranked_score))            
-                        await umrbot.send_message(mh,"User info of **"+user.username+"** in mode **"+mode+"**",embed=emb)                
+                        await client.send_message(mh,"User info of **"+user.username+"** in mode **"+mode+"**",embed=emb)                
                     except Exception as ex:
                         print(ex)
                         
-                        await umrbot.send_message(mh,"**Error** : Internal Error Occured \n```"+str(ex)+"```")                 
+                        await client.send_message(mh,"**Error** : Internal Error Occured \n```"+str(ex)+"```")                 
                 if type=="setuser":
-                    l = open("osuusername.txt","r")
+                    l = open("osuusername.txt","r+")
                     content = l.readlines()
                     l.close()
                     
@@ -179,46 +182,46 @@ async def on_message(message):
                             f.write(line)
                     f.write(str(mau.id)+"::"+argu+"\n")
                     f.close()
-                    await umrbot.send_message(mh,"Your Discord account has been linked to osu! username `"+argu+"`")
+                    await client.send_message(mh,"Your Discord account has been linked to osu! username `"+argu+"`")
                                     
 
         
         if message.content.startswith(prefix+"sakujes"):
-            await umrbot.send_message(mh, "sakuješ "+mcp[a+7:])
+            await client.send_message(mh, "sakuješ "+mcp[a+7:])
         elif message.content.startswith(prefix+"cls"):
             if(not mau.server_permissions.manage_messages):
-                await umrbot.send_message(mh,"<@"+str(mau.id)+"> "+", This command is for people that have **MANAGE MESSAGE** only!")
+                await client.send_message(mh,"<@"+str(mau.id)+"> "+", This command is for people that have **MANAGE MESSAGE** only!")
             else:
 
-                await umrbot.send_message(mh,"** **{}** **".format("\n"*150)) #
+                await client.send_message(mh,"** **{}** **".format("\n"*150)) #
                         
                     
         elif message.content.startswith(prefix+"setgame "):
             text=mcp[a+8:]        
             if(str(mau.id)!="254214302653743104" and str(mau.id)!="389286877133537290"):
-                await umrbot.send_message(mh,"<@"+str(mau.id)+"> "+", This command is for **owner** only!")
+                await client.send_message(mh,"<@"+str(mau.id)+"> "+", This command is for **owner** only!")
             elif "||" in text:
                 text2=text.split("||")
-                await umrbot.change_presence(game=discord.Game(name=text2[1],type=int(text2[0])))
-                await umrbot.send_message(mh,":joy::ok_hand::fire:") #
+                await client.change_presence(game=discord.Game(name=text2[1],type=int(text2[0])))
+                await client.send_message(mh,":joy::ok_hand::fire:") #
             else:
-                await umrbot.change_presence(game=discord.Game(name=text))
-                await umrbot.send_message(mh,":ok_hand:") #            
+                await client.change_presence(game=discord.Game(name=text))
+                await client.send_message(mh,":ok_hand:") #            
         elif mc.startswith(prefix+"ping"):
             msg=mcp[a+4:]
             timeb4=dt.datetime.now()
-            #pongmsg = await umrbot.send_message(mh, "Pong! *C* **a** *l* **c** *u* **l** *a* **t** *i* **n** *g*")#(timea4-timeb4).total_seconds()*1000)
-            pongmsg=await umrbot.send_message(mh,"Pong!")
+            #pongmsg = await client.send_message(mh, "Pong! *C* **a** *l* **c** *u* **l** *a* **t** *i* **n** *g*")#(timea4-timeb4).total_seconds()*1000)
+            pongmsg=await client.send_message(mh,"Pong!")
             timea4=dt.datetime.now()
             dot=""
             #for num in range(1,4):
             #    dot+="."
-            #    await umrbot.edit_message(pongmsg, new_content="Pong! (Took {0}ms){1}".format(str(round((random.randint(0,2000)+random.random())*100)/100),dot))
+            #    await client.edit_message(pongmsg, new_content="Pong! (Took {0}ms){1}".format(str(round((random.randint(0,2000)+random.random())*100)/100),dot))
             #    time.sleep(1)
-            await umrbot.edit_message(pongmsg, new_content="Pong! (Took **{}**ms) :heart:".format(str(math.ceil(round(((timea4-timeb4).total_seconds()*1000)*100)/100))))
+            await client.edit_message(pongmsg, new_content="Pong! (Took **{}**ms) :heart:".format(str(math.ceil(round(((timea4-timeb4).total_seconds()*1000)*100)/100))))
         elif message.content.startswith(prefix+"repeat "):
             if(str(mau.id)!="254214302653743104" and str(mau.id)=="389286877133537290"):
-                await umrbot.send_message(mh,"<@"+str(mau.id)+"> "+", This command is for **owner** only!")
+                await client.send_message(mh,"<@"+str(mau.id)+"> "+", This command is for **owner** only!")
             else:
                 args=mcp.split(" ")
                 times=int(args[1])
@@ -227,7 +230,7 @@ async def on_message(message):
                 text=" ".join(args)
                 for num in range(0,times):
                     time.sleep(0.1)
-                    await umrbot.send_message(mh,text)
+                    await client.send_message(mh,text)
         elif mc.startswith(prefix+"urban "):
             urbanword=mcp[a+6:]
             defs = ud.define(urbanword)
@@ -242,12 +245,12 @@ async def on_message(message):
                 stri3=str(d.downvotes)
                 break
             em = discord.Embed(title=stri0, description=stri1, colour=ms.me.color)
-            em.add_field(name="Upvote",value=stri2,inline=True)
-            em.add_field(name="Downvote",value=stri3,inline=True)
-            await umrbot.send_message(message.channel, embed=em)
+            em.add_field(name=":+1: Upvote",value=stri2,inline=True)
+            em.add_field(name=":-1: Downvote",value=stri3,inline=True)
+            await client.send_message(message.channel, embed=em)
         elif message.content.startswith(prefix+"blacklist "):
             if(str(mau.id)!="254214302653743104" and str(mau.id)=="389286877133537290"):
-               await umrbot.send_message(mh,"<@"+str(mau.id)+"> "+", This command is for **owner** only!")
+               await client.send_message(mh,"<@"+str(mau.id)+"> "+", This command is for **owner** only!")
             else:
                 user=mcp[a+10:].replace("<","").replace("@","").replace("!","").replace("&","").replace(">","")
                 if (user not in unallowed):
@@ -255,16 +258,16 @@ async def on_message(message):
                         file = open("unallowed.txt","a") 
                         file.write(str(user)+"\n")
                         file.close()
-                        await umrbot.send_message(mh,":ok_hand:")
+                        await client.send_message(mh,":ok_hand:")
                     elif(user == "254214302653743104"):
-                        await umrbot.send_message(mh,"No owner blacklisting :stuck_out_tongue_winking_eye:")
+                        await client.send_message(mh,"No owner blacklisting :stuck_out_tongue_winking_eye:")
                     elif(user == "389286877133537290"):
-                        await umrbot.send_message(mh,"No self blacklisting :stuck_out_tongue_winking_eye:")
+                        await client.send_message(mh,"No self blacklisting :stuck_out_tongue_winking_eye:")
                     else:
-                        await umrbot.send_message(mh,"This user is already in a black-list :joy::ok_hand:")
+                        await client.send_message(mh,"This user is already in a black-list :joy::ok_hand:")
         elif message.content.startswith(prefix+"unblacklist "):
             if(str(mau.id)!="254214302653743104" and str(mau.id)=="389286877133537290"):
-               await umrbot.send_message(mh,"<@"+str(mau.id)+"> "+", This command is for **owner** only!")
+               await client.send_message(mh,"<@"+str(mau.id)+"> "+", This command is for **owner** only!")
             else:
                 user=mcp[a+12:].replace("<","").replace("@","").replace("!","").replace("&","").replace(">","")
                 if (user in unallowed):
@@ -274,48 +277,48 @@ async def on_message(message):
                     daq=0
                     for line in lines:
                         f.write(line)
-                    await umrbot.send_message(mh,":ok_hand:")
+                    await client.send_message(mh,":ok_hand:")
                     f.close()
                 else:
-                    await umrbot.send_message(mh,"This user is not in a black-list :joy::ok_hand:")
+                    await client.send_message(mh,"This user is not in a black-list :joy::ok_hand:")
         elif message.content.startswith(prefix+"post "):
             if(str(mau.id)!="254214302653743104" and str(mau.id)=="389286877133537290"):
-                await umrbot.send_message(mh,"<@"+str(mau.id)+"> "+", This command is for **owner** only!")
+                await client.send_message(mh,"<@"+str(mau.id)+"> "+", This command is for **owner** only!")
 
                 data=mcp.split("|")
                 
                 r = requests.post(urlaa+"getGJSongInfo.php", data={'songID':i})
-                await umrbot.send_message(mh,":ok_hand:")                     
+                await client.send_message(mh,":ok_hand:")                     
         elif message.content.startswith(prefix+"load "):
             if(str(mau.id)!="254214302653743104" and str(mau.id)=="389286877133537290"):
-               await umrbot.send_message(mh,"<@"+str(mau.id)+"> "+", This command is for **owner** only!")
+               await client.send_message(mh,"<@"+str(mau.id)+"> "+", This command is for **owner** only!")
             else:
                 cog=mcp[a+5:]
                 try:
-                    umrbot.load_extension(cog)
+                    client.load_extension(cog)
                 except Exception as e:
-                    await umrbot.send_message(mh,'\N{PISTOL}')
-                    await umrbot.send_message(mh,'{}: {}'.format(type(e).__name__, e))
+                    await client.send_message(mh,'\N{PISTOL}')
+                    await client.send_message(mh,'{}: {}'.format(type(e).__name__, e))
                 else:
-                    await umrbot.send_message(mh,":ok_hand:")
+                    await client.send_message(mh,":ok_hand:")
         elif message.content.startswith(prefix+"unload "):
             if(str(mau.id)!="254214302653743104" and str(mau.id)=="389286877133537290"):
-               await umrbot.send_message(mh,"<@"+str(mau.id)+"> "+", This command is for **owner** only!")
+               await client.send_message(mh,"<@"+str(mau.id)+"> "+", This command is for **owner** only!")
             else:
                 cog=mcp[a+7:]
                 try:
-                    umrbot.load_extension(cog)
+                    client.load_extension(cog)
                 except Exception as e:
-                    await umrbot.send_message(mh,'\N{PISTOL}')
-                    await umrbot.send_message(mh,'{}: {}'.format(type(e).__name__, e))
+                    await client.send_message(mh,'\N{PISTOL}')
+                    await client.send_message(mh,'{}: {}'.format(type(e).__name__, e))
                 else:
-                    await umrbot.send_message(mh,":ok_hand:")                          
+                    await client.send_message(mh,":ok_hand:")                          
         elif message.content.startswith(prefix+"suggest "):
              suggestion=str(mt)+" UTC : "+str(mau)+" suggested : "+mcp[a+8:]
              file = codecs.open("suggestion.txt","a","utf-8-sig") 
              file.write("\n"+str(suggestion)+"\n")
              file.close()
-             await umrbot.send_message(mh,":ok_hand:")
+             await client.send_message(mh,":ok_hand:")
         elif message.content.startswith(prefix+"song "):
             i=mc[a+5:]
             r = requests.post(urlaa+"getGJSongInfo.php", data={'songID':i})
@@ -332,35 +335,35 @@ async def on_message(message):
             gstr = gstr.replace("\n7","\n**Song Banned :** Please do this command again...",1)
             gstr = gstr.replace("-1","If the song isn't banned, Maybe you are not entering the ID. **I** Can't do that!",1)
             sss=urllib.parse.unquote(gstr)
-            await umrbot.send_message(message.channel,sss)
+            await client.send_message(message.channel,sss)
         elif message.content.startswith(prefix+"level "):
             levels = mc[a+6:]
             r = requests.get(urlaa+'/tools/bot/levelSearchBot.php?str='+levels)
             sal=r.content.decode("utf-8")
-            await umrbot.send_message(mh,sal)
+            await client.send_message(mh,sal)
         elif message.content.startswith(prefix+"whorated "):
             level = mc[a+10:]
             url = urlaa+"/tools/bot/whoRatedBot.php?level="+level
             html = urlopen(url).read()
             soup = BeautifulSoup(html,"html.parser")
             text = soup.get_text()
-            await umrbot.send_message(mh,text)
+            await client.send_message(mh,text)
         elif message.content.startswith(prefix+"songup "):
             ids = mc[a+8:]
             r = requests.post(urlaa+"tools/songAdd.php", data={'songlink': ids})
             strex=r.text.replace("<b>Soundcloud links</b> or <b>Direct links</b> or <b>Dropbox links</b> only accepted, <b><font size=\"5\">NO YOUTUBE LINKS</font></b><br><form action=\"songAdd.php\" method=\"post\">Link: <input type=\"text\" name=\"songlink\"><br><input type=\"submit\" value=\"Add Song\"></form>","")
             strex=strex.replace("<b>","**")
             strex=strex.replace("</b><hr>","**")
-            await umrbot.send_message(mh,strex)
+            await client.send_message(mh,strex)
         elif message.content.startswith(prefix+"b64en "):
             text = mcp[a+6:]
             enc = base64.b64encode(text.encode('ascii')).decode('utf8')
             enc=enc.replace('b\'','**Your Encoded Text : **',1)
             enc=enc.replace('\'','',1)
-            await umrbot.send_message(mh,"**Your encoded text : ** `"+enc+"`")
+            await client.send_message(mh,"**Your encoded text : ** `"+enc+"`")
         elif message.content.startswith(prefix+"b64de "):
             text = mcp[a+6:]
-            await umrbot.send_message(mh,"**Your decoded text : ** `"+(base64.b64decode(text.encode('utf-8')).decode('utf-8'))+"`")
+            await client.send_message(mh,"**Your decoded text : ** `"+(base64.b64decode(text.encode('utf-8')).decode('utf-8'))+"`")
         elif mc.startswith(prefix+"songreup "):
             await ubot.send_message(mh,"Working in Progress...")
         elif m(prefix+"music "):
@@ -368,7 +371,7 @@ async def on_message(message):
             subcmd=args[1]
             url = args[2]
             if(subcmd=="play"):
-                voice=await umrbot.join_voice_channel(channel)
+                voice=await client.join_voice_channel(channel)
                 player = await voice.create_ytdl_player(url)
                 player.start()
                 
@@ -381,7 +384,7 @@ async def on_message(message):
                 html = urlopen(url).read()
                 soup = BeautifulSoup(html,"html.parser")
                 text = soup.get_text()
-                await umrbot.send_message(mh,text)
+                await client.send_message(mh,text)
             except ValueError:
                 print("Error")
         elif mc.startswith(prefix+"player "):
@@ -391,7 +394,7 @@ async def on_message(message):
                 html = urlopen(url).read()
                 soup = BeautifulSoup(html,"html.parser")
                 text = soup.get_text()
-                await umrbot.send_message(mh,text)
+                await client.send_message(mh,text)
             except ValueError:
                 print("Error")
         elif mc.startswith(prefix+"sayd"):
@@ -408,14 +411,14 @@ async def on_message(message):
                     dot=url.split(".")
                     resp = requests.get(url, stream=True)
                     objxd = io.BytesIO(resp.content)                
-                    await umrbot.delete_message(message)                    
-                    await umrbot.send_file(mh,content=msg,fp=objxd,filename=spl[len(spl)-1])
+                    await client.delete_message(message)                    
+                    await client.send_file(mh,content=msg,fp=objxd,filename=spl[len(spl)-1])
                 else:
-                    await umrbot.delete_message(message)                
-                    await umrbot.send_message(mh,content=msg)                    
+                    await client.delete_message(message)                
+                    await client.send_message(mh,content=msg)                    
                     
             except discord.errors.Forbidden as ex:
-                await umrbot.send_message(mau,content=msg)                
+                await client.send_message(mau,content=msg)                
 
         elif mc.startswith(prefix+"say"):
             msg=mcp[a+4:]
@@ -431,48 +434,48 @@ async def on_message(message):
                     dot=url.split(".")
                     resp = requests.get(url, stream=True)
                     objxd = io.BytesIO(resp.content)                                  
-                    await umrbot.send_file(mh,content=msg,fp=objxd,filename=spl[len(spl)-1])
+                    await client.send_file(mh,content=msg,fp=objxd,filename=spl[len(spl)-1])
                 else:             
-                    await umrbot.send_message(mh,content=msg)                    
+                    await client.send_message(mh,content=msg)                    
                     
             except discord.errors.Forbidden as ex:
-                await umrbot.send_message(mau,content=msg)   
-        elif mc.startswith(prefix+"eval "):
-            if(str(mau.id)!="254214302653743104" or str(mau.id)!="389286877133537290"):
-                await umrbot.send_message(mh,"<@"+str(mau.id)+"> "+", This command is for **owner** only!")
-            else:
-                try:    
-                    env = {
-                        'umrbot': umrbot,
-                        'channel': message.channel,
-                        'author': message.author,
-                        'server': message.server,
-                        'message': message,
-                    }
-                    env.update(globals())
-                    to_compile = 'async def func():\n%s' % textwrap.indent(mcp.replace("```","").strip(prefix+"eval"), '    ')
-                    try:
-                        exec(to_compile, env)
-                    except SyntaxError as e:
-                        return await umrbot.send_message(message.channel, get_syntax_error(e))
-                    func = env['func']
-                    try:
-                        await func()
-                    except Exception as e:
-                        await umrbot.send_message(mh, "{}:{}".format(type(e).__name__, e))
-                except Exception as e:
-                        pass
+                await client.send_message(mau,content=msg)   
+##        elif mc.startswith(prefix+"eval "):
+##            if(str(mau.id)!="254214302653743104" or str(mau.id)!="389286877133537290"):
+##                await client.send_message(mh,"<@"+str(mau.id)+"> "+", This command is for **owner** only!")
+##            else:
+##                try:    
+##                    env = {
+##                        'client': client,
+##                        'channel': message.channel,
+##                        'author': message.author,
+##                        'server': message.server,
+##                        'message': message,
+##                    }
+##                    env.update(globals())
+##                    to_compile = 'async def func():\n%s' % textwrap.indent(mcp.replace("```","").strip(prefix+"eval"), '    ')
+##                    try:
+##                        exec(to_compile, env)
+##                    except SyntaxError as e:
+##                        return await client.send_message(message.channel, get_syntax_error(e))
+##                    func = env['func']
+##                    try:
+##                        await func()
+##                    except Exception as e:
+##                        await client.send_message(mh, "{}:{}".format(type(e).__name__, e))
+##                except Exception as e:
+##                        pass
         elif mc.startswith(prefix+"google "):
             stri = mcp[a+7:]
             for url in search(stri, tld='com', lang='en', stop=1,num=1,pause=0.25):
-                await umrbot.send_message(mh,url)
+                await client.send_message(mh,url)
                 break
         elif mc.startswith(prefix+"youtube "):
             stri = mcp[a+8:]
 
             xxx=youtubesrc(stri)      
             #embeds=discord.Embed(title=youtubetitle(xxx),description=youtubedesc(xxx))
-            await umrbot.send_message(mh,youtubesrc(stri))
+            await client.send_message(mh,youtubesrc(stri))
         elif mc.startswith(prefix+"give "): 
             cmdargs=mcp.split(" ")
             name=""
@@ -521,13 +524,13 @@ async def on_message(message):
                 usn=usr.name
             if (name!=""and 0<int(amount)<=64):
                 dir_path = os.path.dirname(os.path.realpath(__file__))
-                await umrbot.send_file(mh,dir_path+"/items/"+iid+"-"+itemdat+".png",filename=iid+"-"+itemdat+".png",content="Given ["+name+"] * "+amount+" to "+usn)
+                await client.send_file(mh,dir_path+"/items/"+iid+"-"+itemdat+".png",filename=iid+"-"+itemdat+".png",content="Given ["+name+"] * "+amount+" to "+usn)
             elif(int(amount)<=0 or int(amount) >64):
-                await umrbot.send_message(mh,"Invalid amount "+amount+", It should be in range 1-64")
+                await client.send_message(mh,"Invalid amount "+amount+", It should be in range 1-64")
             elif(name==""):
-                await umrbot.send_message(mh,"Invalid item ID `"+ori+"`:"+itemdat)   
+                await client.send_message(mh,"Invalid item ID `"+ori+"`:"+itemdat)   
             else:
-                await umrbot.send_message(mh,"Usage : "+prefix+"give <player> <item> <amount> <metadata> [data]")                
+                await client.send_message(mh,"Usage : "+prefix+"give <player> <item> <amount> <metadata> [data]")                
         elif mc.startswith(prefix+"summon "):
             cmdargs=mcp.split(" ")
             name=""
@@ -569,9 +572,9 @@ async def on_message(message):
                 usn=random.choice(mmm).name               
             if (name!=""and issummonable==1):
                 dir_path = os.path.dirname(os.path.realpath(__file__))
-                await umrbot.send_file(mh,dir_path+"/entities/"+iid+".png",filename=iid+".png",content="Object Summoned (Entity : {})".format(name))
+                await client.send_file(mh,dir_path+"/entities/"+iid+".png",filename=iid+".png",content="Object Summoned (Entity : {})".format(name))
             else:
-                await umrbot.send_message(mh,"Usage : "+prefix+"summon <Entity> <x> <y> <z> [data]")
+                await client.send_message(mh,"Usage : "+prefix+"summon <Entity> <x> <y> <z> [data]")
 
         elif mc.startswith(prefix+"help -c"):
             msg=mc.split(" ")
@@ -579,7 +582,7 @@ async def on_message(message):
             if len(msg)>=3:
                 index=int(msg[2])-1
             F = open('litchbot.txt', 'r')
-            await umrbot.send_message(mh,F.read().split("|")[index])
+            await client.send_message(mh,F.read().split("|")[index])
             F.close()            
         elif mc.startswith(prefix+"help"):
             msg=mc.split(" ")
@@ -587,21 +590,21 @@ async def on_message(message):
             if len(msg)>=2:
                 index=int(msg[1])-1
             F = open('litchbot.txt', 'r')
-            await umrbot.send_message(mau,F.read().split("|")[index])
-            await umrbot.send_message(mh,"Okay! Send help thru your DM! Check it :D")        
+            await client.send_message(mau,F.read().split("|")[index])
+            await client.send_message(mh,"Okay! Send help thru your DM! Check it :D")        
             F.close()         
         elif mc.startswith(prefix+"touhou"):
             F = open('iosys.txt', 'r')
             liness = F.readlines()
-            await umrbot.send_message(mh,random.choice(liness))
+            await client.send_message(mh,random.choice(liness))
             F.close()
         elif mc.startswith(prefix+"api"):
             F = open('api.txt', 'r')
-            await umrbot.send_message(mh,F.read())
+            await client.send_message(mh,F.read())
             F.close() 
         elif mc.startswith(prefix+"changelog"):
             F = open('changelog.txt', 'r')
-            await umrbot.send_message(mh,F.read())
+            await client.send_message(mh,F.read())
             F.close()
         elif mc.startswith(prefix+"serverinfo"):
             mycolor=mau.color
@@ -621,66 +624,47 @@ async def on_message(message):
             if(ms.afk_channel!=None):
                 em.add_field(name="AFK",value=str(int(ms.afk_timeout/60))+"min in `"+str(ms.afk_channel)+"` channel",inline=True)                   
             em.set_footer(text="Owner : "+ms.owner.name+"#"+str(ms.owner.discriminator)+" ("+str(ms.owner.id)+")", icon_url=ms.owner.avatar_url)
-            await umrbot.send_message(mh,"Info about **__"+ms.name+"__** server",tts=False,embed=em)
+            await client.send_message(mh,"Info about **__"+ms.name+"__** server",tts=False,embed=em)
         elif mc.startswith(prefix+"userinfo "):
             no=ms.get_member_named(mcp[a+9:])
             aa=[]
             if no is None:
-                aa=message.mentions
-
-                for no in aa:
-                    role=""
-                    for i,x in enumerate(no.roles):
-                        if(i):
-                            role+=" ,"
-                        if x.name!="@everyone":
-                            role+=x.name
-                        else:
-                            role+="`@everyone`"
-                    mycolor=no.color
-                    em = discord.Embed(title=no.name+"#"+no.discriminator, colour=mycolor)
-                    em.set_thumbnail(url=no.avatar_url)
-                    em.add_field(name="User ID",value=str(no.id),inline=True)
-                    em.add_field(name="Bot user",value=("Yes" if no.bot else "No"),inline=True)
-                    em.add_field(name="Avatar",value=no.avatar_url,inline=True)                          
-                    em.add_field(name="Joined Date",value=str(no.joined_at.date()),inline=True)                
-                    em.add_field(name="Roles count on "+ms.name,value=str(len(no.roles)),inline=True)
-                    em.add_field(name="Account created at",value=str(no.created_at.date())+" @ "+str(no.created_at.time()),inline=True)
-                    em.add_field(name="Status",value=str(no.status),inline=True)
-                    em.add_field(name="Roles",value=role,inline=True)                        
-                    await umrbot.send_message(mh,"Info about **__"+no.name+"__**",tts=False,embed=em)
-            else:
-                role=""
-                for i,x in enumerate(no.roles):
-                    if(i):
-                        role+=" ,"
-                    if x.name!="@everyone":
-                        role+=x.name
-                    else:
-                        role+="`@everyone`"                    
+                try:
+                    yes=mcp[a+9:]
+                    no=gui.get_user_info(yes)
+                except:
+                    pass
+            if no is None:
+                try:
+                    no=message.mentions[0]
+                except:
+                    pass
+            print("User is "+str(no))
+            try:
                 mycolor=no.color
                 em = discord.Embed(title=no.name+"#"+no.discriminator, colour=mycolor)
                 em.set_thumbnail(url=no.avatar_url)
                 em.add_field(name="User ID",value=str(no.id),inline=True)
                 em.add_field(name="Bot user",value=("Yes" if no.bot else "No"),inline=True)
-                em.add_field(name="Avatar",value=no.avatar_url,inline=True)                    
+                em.add_field(name="Avatar",value=no.avatar_url,inline=True)                          
                 em.add_field(name="Joined Date",value=str(no.joined_at.date()),inline=True)                
                 em.add_field(name="Roles count on "+ms.name,value=str(len(no.roles)),inline=True)
-                em.add_field(name="Account created at",value=str(no.created_at.date()),inline=True)
+                em.add_field(name="Account created at",value=str(no.created_at.date())+" @ "+str(no.created_at.time()),inline=True)
                 em.add_field(name="Status",value=str(no.status),inline=True)
-                em.add_field(name="Roles",value=role,inline=True)                      
-                await umrbot.send_message(mh,"Info about **__"+no.name+"__**",tts=False,embed=em)                                         
+            except:
+                print("!!")
+            await client.send_message(mh,"Info about **__"+no.name+"__**",tts=False,embed=em)                                  
         elif mc.startswith(prefix+"serveremoji"):
             emoji=""
             for i in list(ms.emojis):
                 emoji+=str(i)
-            await umrbot.send_message(mh,emoji)
+            await client.send_message(mh,emoji)
         elif mc.startswith(prefix+"decvoltonify"):
             
             pattern = mcp[a+13:]
 
             nignog=pattern.replace("sakuješ","you suck diki").replace("seš", "you sucks").replace("maincra", "Minecraft").replace("maybe.surge.sh", "maybe").replace(" u ", "you").replace("^", "The above message is ").replace("fals", "false").replace("tru", "true").replace("sam", "same").replace("delet", "delete").replace("gey", "gay")          
-            await umrbot.send_message(mh,"**DECVOLTONIFY TEXT : **"+nignog)           
+            await client.send_message(mh,"**DECVOLTONIFY TEXT : **"+nignog)           
         elif mc.startswith(prefix+"emojify "):
             text=mcp[a+8:]
             o = ""
@@ -720,7 +704,7 @@ async def on_message(message):
                     o += ":question:"
                 elif i == " ":
                     o += " "
-            await umrbot.send_message(mh,o)
+            await client.send_message(mh,o)
         elif mc.startswith(prefix+"emojifyred "):
             text=mcp[a+11:]
             o = ""
@@ -767,8 +751,8 @@ async def on_message(message):
                 elif i == "?":
                     o += ":question:"
                 elif i == " ":
-                    o += " "
-            await umrbot.send_message(mh,o)
+                    o += " "                
+            await client.send_message(mh,o)
         elif mc.startswith(prefix+"listroles"):
             try:
                 os.makedirs("C:\\Discord\\")                
@@ -819,15 +803,15 @@ async def on_message(message):
             finally:
                 pass
             if dices<=0:
-                await umrbot.send_message(mh,"**Error!** : "+str(dices)+" is not a valid coin number")
+                await client.send_message(mh,"**Error!** : "+str(dices)+" is not a valid coin number")
             elif dices>200:
-                await umrbot.send_message(mh,"**Error!** : `Only at most 200 coins can be flip by this command`")
+                await client.send_message(mh,"**Error!** : `Only at most 200 coins can be flip by this command`")
             else:
                 out="Coin flip results : "
                 ##print(dices)
                 for i in range(0,dices):
                     out+="`"+coinlist[random.randint(0,1)]+"` "
-                await umrbot.send_message(mh,out)                
+                await client.send_message(mh,out)                
             
         elif mc.startswith(prefix+"diceroll"):
             dices=1        
@@ -842,16 +826,31 @@ async def on_message(message):
             finally:
                 pass
             if dices<=0:
-                await umrbot.send_message(mh,"**Error!** : "+str(dices)+" is not a valid dice number")
+                await client.send_message(mh,"**Error!** : "+str(dices)+" is not a valid dice number")
             elif dices>200:
-                await umrbot.send_message(mh,"**Error!** : `Only at most 200 dices can be roll by this command`")
+                await client.send_message(mh,"**Error!** : `Only at most 200 dices can be roll by this command`")
             else:
                 out=":game_die: Dice results : "
                 ##print(dices)
                 for i in range(0,dices):
                     out+="`"+str(random.randint(1,6))+"` "
-                await umrbot.send_message(mh,out)                
-            
+                await client.send_message(mh,out)                
+        elif mc.startswith(prefix+"value "):
+            parsed=mcp[a+6:]
+            try:
+                em = discord.Embed(title="Calculator", color=mau.color)
+                em.add_field(name="You asked for answer of",value=str(parsed),inline=False)
+                em.add_field(name="The answer is",value=str(round(eval(parsed),15)),inline=False)
+                await client.send_message(mh,"",embed=em)                
+            except:
+                if(mau.id=="254214302653743104"):
+                    em2 = discord.Embed(title="Knower of the world", color=mau.color)                    
+                    await client.send_message(mh,"The answer of `"+str(parsed)+"` is `"+str((eval(parsed)))+"`")
+                else:
+                    await client.send_message(mh,"you**re** mom gau :joy::ok_hand:")
+
+                
+
             
 ass=asyncio.sleep(1)
 def youtubesrc(textToSearch):
@@ -888,7 +887,7 @@ if __name__ == '__main__':
 
     for extension in initial_extensions:
         try:
-            umrbot.load_extension(extension)
+            client.load_extension(extension)
         except Exception as e:
             print('Failed to load extension {}\n{}: {}'.format(extension, type(e).__name__, e))
         
@@ -896,4 +895,4 @@ def timedelta_milliseconds(td):
     return td.days*86400000 + td.seconds*1000 + td.microseconds/1000
 with open("token.txt","r") as fi:
     contaaent = fi.readlines() 
-    umrbot.run(contaaent[0])
+    client.run(contaaent[0])
