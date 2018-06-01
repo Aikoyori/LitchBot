@@ -1,4 +1,4 @@
-**LitchBot** by LitchSchist
+**LitchBot** by Litch
 **HELP Page 1/3**
 
 **CvoltonGDPS's Command**
@@ -23,7 +23,7 @@
 <NONE YET>
 
 |	
-**LitchSelfBot** by LitchSchist
+**LitchBot** by Litch
 **HELP Page 2/3**
 
 **Fun Command**
@@ -59,8 +59,8 @@
 `repeat` [times] [text] - Send Repetitive message ***OWNER ONLY***
 **Use -c option to display in current chat!!**
 |
-**LitchSelfBot** by LitchSchist
-**HELP Page 2/3**
+**LitchBot** by Litch
+**HELP Page 3/3**
 **osu!commands**
 Mode : std , taiko , ctb , mania
 Uses short mods name (e.g. nf hc nc dt hd)
