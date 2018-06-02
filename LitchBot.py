@@ -893,6 +893,4 @@ if __name__ == '__main__':
         
 def timedelta_milliseconds(td):
     return td.days*86400000 + td.seconds*1000 + td.microseconds/1000
-with open("token.txt","r") as fi:
-    contaaent = fi.readlines() 
-    client.run(contaaent[0])
+client.run(token=os.getenv('token'))
